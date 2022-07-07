@@ -3,27 +3,34 @@ package websocket
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 type Client struct {
-	ID   string
 	Conn *websocket.Conn
 	Pool *Pool
+	ID   string
 }
 
 type Message struct {
-	Type     int    `json:"type"`
-	Time     string `json:"time"`
-	Body     string `json:"body"`
-	ClientID string `json:"client_id"`
+	Type       int    `json:"type"`
+	Time       string `json:"time"`
+	Body       string `json:"body"`
+	Clientname string `json:"client_name"`
 }
 
 func generateRandomString() string {
-	return fmt.Sprintf("%x", time.Now().UnixNano())
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, 10)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
+
 func (c *Client) Read() {
 	defer func() {
 		c.Pool.Unregister <- c
@@ -37,13 +44,12 @@ func (c *Client) Read() {
 			return
 		}
 		now := time.Now().Format("15:04:05 02-01-2006 ")
-		c.ID = generateRandomString()
 
-		client := &Client{ID: c.ID, Conn: c.Conn, Pool: c.Pool}
-		message := Message{Type: messageType, Time: now, Body: string(p), ClientID: c.ID}
+		client := &Client{Conn: c.Conn, Pool: c.Pool, ID: c.ID}
+		message := Message{Type: messageType, Time: now, Body: string(p), Clientname: c.ID}
 		c.Pool.Broadcast <- message
 		fmt.Printf("Message Received: %+v\n", message)
-		fmt.Printf("Message Received: %+v\n", client.ID)
+		fmt.Printf("Message Received: %+v\n", client)
 
 	}
 }

@@ -25,6 +25,7 @@ func (pool *Pool) Start() {
 		case client := <-pool.Register:
 
 			pool.Clients[client] = true
+			client.ID = generateRandomString()
 			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
 			fmt.Println("Connection Pool: ", pool.Clients)
 			fmt.Println("Connection Pool: ", pool.Clients[client])
