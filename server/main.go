@@ -33,7 +33,7 @@ func setupRoutes() {
 }
 
 func main() {
-	fmt.Println("Distributed Chat App v0.01")
+	fmt.Println("Realtime Chat App v1.0")
 	setupRoutes()
 	http.ListenAndServe(":8080", nil)
 }
